@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EIRA · Generador de enlaces</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--marfil:#F5F1EA;--arena:#D8C9AE;--piedra:#A9A296;--cobre:#B06A3D;--grafito:#33312D;--linea:#E4DCCC;--suave:#FBF9F5}
+*{box-sizing:border-box}
+body{font-family:'Montserrat',sans-serif;background:var(--marfil);color:var(--grafito);margin:0;
+  padding:26px 18px 60px;font-size:14px;line-height:1.6}
+.w{max-width:640px;margin:0 auto}
+img.logo{height:34px;margin-bottom:20px}
+h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin:0 0 4px}
+h1 em{font-style:italic;color:var(--cobre)}
+.sub{font-size:12.5px;color:var(--piedra);margin:0 0 24px}
+.eyebrow{font-size:9.5px;letter-spacing:.24em;color:var(--cobre);font-weight:700;margin:26px 0 8px}
+.grupo{background:#fff;border:1px solid var(--linea);border-radius:12px;padding:4px 16px}
+.campo{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F1EBE0}
+.campo:last-child{border-bottom:0}
+.campo label{flex:1;font-size:13.5px}
+.campo input{width:170px;text-align:right;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;
+  border:0;border-bottom:1.5px solid var(--linea);background:none;padding:3px 2px;outline:none}
+.campo input:focus{border-bottom-color:var(--cobre)}
+pre{background:var(--suave);border:1px solid var(--linea);border-radius:10px;padding:14px;font-size:11.5px;
+  white-space:pre-wrap;word-break:break-all;font-family:ui-monospace,Menlo,monospace;color:#5D5A54;margin:8px 0}
+.btn{display:block;width:100%;background:var(--grafito);color:var(--marfil);border:0;border-radius:10px;
+  padding:14px;font-family:'Montserrat',sans-serif;font-size:11.5px;letter-spacing:.13em;font-weight:700;
+  cursor:pointer;margin-bottom:9px}
+.btn.cobre{background:var(--cobre)}
+.ok{text-align:center;font-size:11.5px;color:#7A9068;height:16px}
+.nota{font-size:11.5px;color:var(--piedra);line-height:1.6}
+.aviso{background:#F7F4EE;border-left:3px solid var(--cobre);padding:11px 14px;font-size:12.5px;
+  border-radius:0 6px 6px 0;margin:18px 0}
+</style>
+</head>
+<body><div class="w">
+<img class="logo" src="logo_eira.png" alt="EIRA">
+<h1>Generador de <em>enlaces</em></h1>
+<p class="sub">Uso interno. Crea el enlace personalizado de la app para cada paciente.</p>
+
+<div class="eyebrow">DATOS DE LA PACIENTE</div>
+<div class="grupo">
+  <div class="campo"><label>Base de la app</label><input id="base" value="https://USUARIO.github.io/eira.seguimiento/"></div>
+  <div class="campo"><label>Nombre</label><input id="n" placeholder="María Paula"></div>
+  <div class="campo"><label>Inicio del programa</label><input id="inicio" type="date"></div>
+  <div class="campo"><label>Calorías objetivo</label><input id="kcal" type="number" value="1600"></div>
+  <div class="campo"><label>Proteína objetivo (g)</label><input id="prot" type="number" value="125"></div>
+  <div class="campo"><label>Agua objetivo (L)</label><input id="agua" type="number" step="0.1" value="2.2"></div>
+  <div class="campo"><label>Pasos objetivo</label><input id="pasos" type="number" value="8000"></div>
+  <div class="campo"><label>Sesiones de fuerza / semana</label><input id="ses" type="number" value="3"></div>
+  <div class="campo"><label>Tu WhatsApp (solo dígitos)</label><input id="tel" value="573504628131"></div>
+</div>
+
+<div class="eyebrow">ENLACE PERSONALIZADO</div>
+<pre id="url">—</pre>
+<button class="btn" id="bUrl">COPIAR ENLACE</button>
+
+<div class="eyebrow">MENSAJE PARA ENVIARLE</div>
+<pre id="msg">—</pre>
+<button class="btn cobre" id="bMsg">COPIAR MENSAJE</button>
+<div class="ok" id="ok"></div>
+
+<div class="aviso">
+  Cambia <b>USUARIO</b> en la base por tu usuario de GitHub. El enlace guarda las metas en el
+  teléfono de la paciente la primera vez que lo abre: si después cambias una meta, mándale el
+  enlace nuevo y ella lo abre una vez.
+</div>
+<p class="nota">Los datos de la paciente se guardan solo en su dispositivo. Esta página no envía ni
+almacena información en ningún servidor.</p>
+
+<script>
+var IDS = ["base","n","inicio","kcal","prot","agua","pasos","ses","tel"];
+function armar(){
+  var v = {}; IDS.forEach(function(k){ v[k] = document.getElementById(k).value.trim(); });
+  var base = v.base.replace(/\/+$/,"") + "/index.html";
+  var p = [];
+  if(v.n) p.push("n=" + encodeURIComponent(v.n));
+  if(v.inicio) p.push("inicio=" + v.inicio);
+  ["kcal","prot","agua","pasos","ses"].forEach(function(k){ if(v[k]) p.push(k + "=" + v[k]); });
+  if(v.tel) p.push("tel=" + v.tel.replace(/\D/g,""));
+  var url = base + (p.length ? "?" + p.join("&") : "");
+  document.getElementById("url").textContent = url;
+
+  var nom = v.n ? v.n.split(" ")[0] : "[nombre]";
+  document.getElementById("msg").textContent =
+    nom + ", te dejo tu app de seguimiento. Ya viene con tus metas cargadas:\n\n" + url +
+    "\n\nÁbrela desde el celular y agrégala a tu pantalla de inicio: en iPhone con el botón de " +
+    "compartir → «Agregar a inicio»; en Android desde el menú → «Instalar aplicación».\n\n" +
+    "Registra lo que puedas cada día. El domingo le das al botón de enviar reporte y me llega todo " +
+    "resumido acá. ¿Alguna duda para empezar?";
+}
+IDS.forEach(function(k){ document.getElementById(k).addEventListener("input", armar); });
+function copiar(id, txt){
+  var t = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(function(){ avisar(txt); }, function(){ avisar("No se pudo copiar"); });
+}
+var to; function avisar(t){ var e = document.getElementById("ok"); e.textContent = t;
+  clearTimeout(to); to = setTimeout(function(){ e.textContent = ""; }, 1800); }
+document.getElementById("bUrl").onclick = function(){ copiar("url","Enlace copiado"); };
+document.getElementById("bMsg").onclick = function(){ copiar("msg","Mensaje copiado"); };
+armar();
+</script>
+</div></body>
+</html>

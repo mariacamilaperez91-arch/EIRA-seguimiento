@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F1EA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="EIRA">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>EIRA · Seguimiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --marfil:#F5F1EA; --arena:#D8C9AE; --piedra:#A9A296; --cobre:#B06A3D; --grafito:#33312D;
+  --linea:#E4DCCC; --suave:#FBF9F5; --verde:#7A9068;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans); background:var(--marfil); color:var(--grafito);
+  font-size:15px; line-height:1.55; padding-bottom:env(safe-area-inset-bottom);
+}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 110px}
+
+/* ── encabezado ── */
+header{padding:18px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+header img{height:30px}
+header .quien{text-align:right;font-size:10px;letter-spacing:.1em;color:var(--piedra);line-height:1.5}
+header .quien b{display:block;font-size:12px;color:var(--grafito);letter-spacing:.02em;font-weight:600}
+
+/* ── avisos ── */
+.aviso{background:#FBF0E9;border-left:3px solid var(--cobre);padding:10px 13px;border-radius:0 6px 6px 0;
+  font-size:12.5px;line-height:1.5;color:#6B5D52;margin:0 0 14px}
+.aviso b{color:var(--cobre)}
+
+/* ── tabs ── */
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(245,241,234,.96);
+  backdrop-filter:blur(12px);border-top:1px solid var(--linea);z-index:50;
+  padding-bottom:env(safe-area-inset-bottom)}
+nav .in{max-width:560px;margin:0 auto;display:flex}
+nav button{flex:1;background:none;border:0;padding:13px 4px 15px;font-family:var(--sans);
+  font-size:10px;letter-spacing:.14em;font-weight:600;color:var(--piedra);cursor:pointer}
+nav button .ic{display:block;font-size:17px;margin-bottom:3px;line-height:1;font-weight:400}
+nav button.on{color:var(--cobre)}
+
+/* ── secciones ── */
+section{display:none;animation:ap .28s ease}
+section.on{display:block}
+@keyframes ap{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-family:var(--serif);font-size:31px;font-weight:300;line-height:1.08;margin:6px 0 3px}
+h1 em{font-style:italic;color:var(--cobre)}
+.sub{font-size:12px;color:var(--piedra);margin:0 0 18px}
+h2{font-family:var(--serif);font-size:21px;font-weight:400;margin:26px 0 8px}
+.eyebrow{font-size:9.5px;letter-spacing:.24em;color:var(--cobre);font-weight:700;margin:24px 0 8px}
+
+/* ── fecha ── */
+.fecha{display:flex;align-items:center;gap:10px;background:var(--suave);border:1px solid var(--linea);
+  border-radius:10px;padding:8px 10px;margin-bottom:16px}
+.fecha button{background:none;border:0;font-size:19px;color:var(--cobre);padding:2px 9px;cursor:pointer;line-height:1}
+.fecha .txt{flex:1;text-align:center}
+.fecha .d{font-size:14px;font-weight:600;text-transform:capitalize}
+.fecha .s{font-size:10.5px;color:var(--piedra);letter-spacing:.06em}
+
+/* ── anillos ── */
+.anillos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+.anillo{text-align:center}
+.anillo svg{width:100%;max-width:74px;height:auto;display:block;margin:0 auto}
+.anillo .v{font-family:var(--serif);font-size:15px;font-weight:600;fill:var(--grafito)}
+.anillo .n{font-size:9px;letter-spacing:.1em;color:var(--piedra);margin-top:3px;font-weight:600}
+
+/* ── campos ── */
+.grupo{background:#fff;border:1px solid var(--linea);border-radius:12px;padding:4px 14px;margin-bottom:14px}
+.campo{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F1EBE0}
+.campo:last-child{border-bottom:0}
+.campo label{flex:1;font-size:13.5px}
+.campo label small{display:block;font-size:10.5px;color:var(--piedra);letter-spacing:.04em}
+.campo input[type=number],.campo input[type=text],.campo select{
+  width:96px;text-align:right;font-family:var(--sans);font-size:15px;font-weight:600;color:var(--grafito);
+  border:0;border-bottom:1.5px solid var(--linea);background:none;padding:3px 2px;outline:none;
+  border-radius:0;-webkit-appearance:none}
+.campo select{width:132px;text-align:left;font-weight:500;font-size:13px}
+.campo input:focus,.campo select:focus{border-bottom-color:var(--cobre)}
+.campo .uni{font-size:11px;color:var(--piedra);min-width:26px}
+textarea{width:100%;font-family:var(--sans);font-size:13.5px;color:var(--grafito);border:1px solid var(--linea);
+  border-radius:10px;padding:11px 12px;background:#fff;outline:none;resize:vertical;min-height:74px;line-height:1.5}
+textarea:focus{border-color:var(--cobre)}
+
+/* escalas */
+.escala{display:flex;gap:5px}
+.escala button{flex:1;min-width:34px;background:#fff;border:1px solid var(--linea);border-radius:8px;
+  padding:8px 0;font-family:var(--sans);font-size:13px;font-weight:600;color:var(--piedra);cursor:pointer}
+.escala button.on{background:var(--cobre);border-color:var(--cobre);color:#fff}
+.esc-wrap{padding:11px 0;border-bottom:1px solid #F1EBE0}
+.esc-wrap:last-child{border-bottom:0}
+.esc-wrap .lb{font-size:13.5px;margin-bottom:7px}
+.esc-wrap .lb small{color:var(--piedra);font-size:10.5px;letter-spacing:.04em}
+
+/* ── botones ── */
+.btn{display:block;width:100%;text-align:center;background:var(--grafito);color:var(--marfil);border:0;
+  border-radius:10px;padding:15px;font-family:var(--sans);font-size:12px;letter-spacing:.13em;font-weight:700;
+  cursor:pointer;margin-bottom:10px;text-decoration:none}
+.btn.cobre{background:var(--cobre)}
+.btn.linea{background:none;border:1.5px solid var(--linea);color:var(--grafito)}
+.ok{text-align:center;font-size:11.5px;color:var(--verde);letter-spacing:.06em;height:16px;margin-bottom:8px}
+
+/* ── semana ── */
+.tabla{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:6px}
+.tabla th{background:var(--grafito);color:var(--marfil);font-size:9px;letter-spacing:.1em;font-weight:700;
+  padding:8px 5px;text-align:center}
+.tabla th:first-child{text-align:left}
+.tabla td{padding:8px 5px;border-bottom:1px solid #F1EBE0;text-align:center}
+.tabla td:first-child{text-align:left;font-weight:600;font-size:11.5px}
+.tabla tr.vacio td{color:var(--piedra)}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0 6px}
+.kpi{background:var(--suave);border:1px solid var(--linea);border-radius:11px;padding:12px 13px}
+.kpi .n{font-size:9px;letter-spacing:.14em;color:var(--cobre);font-weight:700}
+.kpi .v{font-family:var(--serif);font-size:26px;line-height:1.15;margin-top:2px}
+.kpi .v small{font-size:12px;color:var(--piedra)}
+.nota{font-size:11.5px;color:var(--piedra);line-height:1.55;margin:10px 0 18px}
+pre{background:var(--suave);border:1px solid var(--linea);border-radius:10px;padding:12px;font-size:10.5px;
+  overflow-x:auto;white-space:pre;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#5D5A54}
+.pie{text-align:center;font-size:10px;color:var(--piedra);line-height:1.7;margin:28px 0 10px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <img src="logo_eira.png" alt="EIRA">
+    <div class="quien"><b id="hNombre">—</b><span id="hPrograma">SEGUIMIENTO</span></div>
+  </header>
+
+  <div id="avisoPreview" class="aviso" style="display:none">
+    <b>Modo vista previa.</b> Aquí los datos no se guardan. Abre la app desde el enlace que te enviaron
+    o desde el icono en tu pantalla de inicio.
+  </div>
+
+  <!-- ════════ HOY ════════ -->
+  <section id="s-hoy" class="on">
+    <h1>Tu <em>día</em></h1>
+    <p class="sub">Registra apenas puedas. Un dato incompleto sirve más que ninguno.</p>
+
+    <div class="fecha">
+      <button id="bPrev" aria-label="Día anterior">‹</button>
+      <div class="txt"><div class="d" id="fTxt">—</div><div class="s" id="fSem">—</div></div>
+      <button id="bNext" aria-label="Día siguiente">›</button>
+    </div>
+
+    <div class="anillos" id="anillos"></div>
+
+    <div class="eyebrow">PESO Y NUTRICIÓN</div>
+    <div class="grupo">
+      <div class="campo"><label>Peso en ayunas<small>AL LEVANTARTE</small></label><input type="number" step="0.1" inputmode="decimal" id="peso"><span class="uni">kg</span></div>
+      <div class="campo"><label>Calorías</label><input type="number" inputmode="numeric" id="kcal"><span class="uni">kcal</span></div>
+      <div class="campo"><label>Proteína</label><input type="number" inputmode="numeric" id="prot"><span class="uni">g</span></div>
+      <div class="campo"><label>Carbohidratos</label><input type="number" inputmode="numeric" id="carb"><span class="uni">g</span></div>
+      <div class="campo"><label>Grasa</label><input type="number" inputmode="numeric" id="gras"><span class="uni">g</span></div>
+      <div class="campo"><label>Agua</label><input type="number" step="0.1" inputmode="decimal" id="agua"><span class="uni">L</span></div>
+    </div>
+
+    <div class="eyebrow">MOVIMIENTO</div>
+    <div class="grupo">
+      <div class="campo"><label>Pasos</label><input type="number" inputmode="numeric" id="pasos"><span class="uni"></span></div>
+      <div class="campo"><label>Entrenamiento</label>
+        <select id="ejer">
+          <option value="">—</option><option>Fuerza</option><option>Cardio Z2</option><option>HIIT</option>
+          <option>Clase funcional</option><option>Movilidad</option><option>Caminata</option>
+          <option>Mixto</option><option>Descanso</option>
+        </select></div>
+      <div class="campo"><label>Duración</label><input type="number" inputmode="numeric" id="min"><span class="uni">min</span></div>
+      <div class="campo"><label>Esfuerzo percibido<small>1 MUY SUAVE · 10 MÁXIMO</small></label><input type="number" inputmode="numeric" id="rpe" min="1" max="10"><span class="uni">/10</span></div>
+    </div>
+
+    <div class="eyebrow">RECUPERACIÓN</div>
+    <div class="grupo">
+      <div class="campo"><label>Horas de sueño</label><input type="number" step="0.5" inputmode="decimal" id="sueno"><span class="uni">h</span></div>
+      <div class="esc-wrap"><div class="lb">Calidad del sueño <small>1 MAL · 5 EXCELENTE</small></div><div class="escala" data-k="calidad"></div></div>
+      <div class="esc-wrap"><div class="lb">Energía <small>1 AGOTADA · 5 MUY BIEN</small></div><div class="escala" data-k="energia"></div></div>
+      <div class="esc-wrap"><div class="lb">Digestión <small>1 MAL · 5 EXCELENTE</small></div><div class="escala" data-k="digestion"></div></div>
+    </div>
+
+    <div class="eyebrow">PROTOCOLO</div>
+    <div class="grupo">
+      <div class="esc-wrap"><div class="lb">¿Cumpliste hoy? <small>SUPLEMENTOS Y TRATAMIENTO INDICADO</small></div>
+        <div class="escala" data-k="protocolo" data-opts="Sí|Parcial|No"></div></div>
+    </div>
+
+    <div class="eyebrow">NOTAS DEL DÍA</div>
+    <textarea id="notas" placeholder="Síntomas, antojos, algo que se salió de lo normal, cómo te sentiste…"></textarea>
+    <div class="ok" id="okHoy"></div>
+  </section>
+
+  <!-- ════════ SEMANA ════════ -->
+  <section id="s-semana">
+    <h1>Tu <em>semana</em></h1>
+    <p class="sub">Al terminar la semana, envía el reporte con un toque.</p>
+
+    <div class="fecha">
+      <button id="wPrev" aria-label="Semana anterior">‹</button>
+      <div class="txt"><div class="d" id="wTxt">—</div><div class="s" id="wRango">—</div></div>
+      <button id="wNext" aria-label="Semana siguiente">›</button>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+    <table class="tabla" id="tSemana"></table>
+
+    <div class="eyebrow">ENVIAR</div>
+    <button class="btn cobre" id="bWhats">ENVIAR REPORTE POR WHATSAPP</button>
+    <button class="btn linea" id="bCopiar">COPIAR REPORTE AL PORTAPAPELES</button>
+    <div class="ok" id="okSem"></div>
+    <p class="nota">El reporte se arma solo con lo que registraste. Si algún día quedó vacío, aparece
+    como sin dato — es información útil, no un error.</p>
+  </section>
+
+  <!-- ════════ AJUSTES ════════ -->
+  <section id="s-ajustes">
+    <h1>Tus <em>metas</em></h1>
+    <p class="sub">Las define tu médica. No las cambies sin hablarlo con ella.</p>
+
+    <div class="grupo">
+      <div class="campo"><label>Nombre</label><input type="text" id="cfgNombre" style="width:150px;text-align:right"></div>
+      <div class="campo"><label>Inicio del programa</label><input type="date" id="cfgInicio" style="width:150px;text-align:right;font-size:13px"></div>
+      <div class="campo"><label>Calorías objetivo</label><input type="number" inputmode="numeric" id="cfgKcal"><span class="uni">kcal</span></div>
+      <div class="campo"><label>Proteína objetivo</label><input type="number" inputmode="numeric" id="cfgProt"><span class="uni">g</span></div>
+      <div class="campo"><label>Agua objetivo</label><input type="number" step="0.1" inputmode="decimal" id="cfgAgua"><span class="uni">L</span></div>
+      <div class="campo"><label>Pasos objetivo</label><input type="number" inputmode="numeric" id="cfgPasos"><span class="uni"></span></div>
+      <div class="campo"><label>Sesiones de fuerza<small>POR SEMANA</small></label><input type="number" inputmode="numeric" id="cfgSes"><span class="uni"></span></div>
+      <div class="campo"><label>WhatsApp de tu médica</label><input type="text" id="cfgTel" style="width:150px;text-align:right;font-size:13px"></div>
+    </div>
+
+    <div class="eyebrow">RESPALDO</div>
+    <p class="nota">Tus datos se guardan solo en este teléfono. Si cambias de equipo o borras el
+    navegador, se pierden. Descarga un respaldo de vez en cuando.</p>
+    <button class="btn linea" id="bExport">DESCARGAR RESPALDO</button>
+    <button class="btn linea" id="bImport">RESTAURAR DESDE UN RESPALDO</button>
+    <input type="file" id="fileImport" accept="application/json" style="display:none">
+    <div class="ok" id="okCfg"></div>
+
+    <p class="pie">
+      EIRA · Precision Longevity Medicine<br>
+      Esta aplicación es una herramienta de registro personal y no reemplaza la consulta médica.<br>
+      Tus datos permanecen únicamente en tu dispositivo. Ley 1581 de 2012.
+    </p>
+  </section>
+</div>
+
+<nav><div class="in">
+  <button data-s="hoy" class="on"><span class="ic">◉</span>HOY</button>
+  <button data-s="semana"><span class="ic">▤</span>SEMANA</button>
+  <button data-s="ajustes"><span class="ic">✧</span>METAS</button>
+</div></nav>
+
+<script>
+"use strict";
+/* ─────────── almacenamiento con respaldo en memoria ─────────── */
+var MEM = {}, PERSIST = true;
+try { localStorage.setItem("_t","1"); localStorage.removeItem("_t"); }
+catch(e){ PERSIST = false; }
+if(!PERSIST) document.getElementById("avisoPreview").style.display = "block";
+
+function guardar(k,v){ var s = JSON.stringify(v);
+  if(PERSIST){ try{ localStorage.setItem(k,s); return; }catch(e){} } MEM[k]=s; }
+function leer(k,def){ var s = null;
+  if(PERSIST){ try{ s = localStorage.getItem(k); }catch(e){} }
+  if(s===null) s = MEM[k];
+  if(s===undefined||s===null) return def;
+  try{ return JSON.parse(s); }catch(e){ return def; } }
+
+/* ─────────── configuración ─────────── */
+var CFG_DEF = { nombre:"", inicio:"", kcal:1600, prot:120, agua:2.2, pasos:8000, ses:3, tel:"573504628131" };
+var cfg = Object.assign({}, CFG_DEF, leer("eira_cfg", {}));
+
+/* personalización por enlace: ?n=Nombre&kcal=1600&prot=125&agua=2.2&pasos=8000&ses=3&inicio=2026-08-03&tel=57... */
+(function(){
+  var p = new URLSearchParams(location.search), tocado = false;
+  var mapa = { n:"nombre", nombre:"nombre", inicio:"inicio", kcal:"kcal", prot:"prot",
+               agua:"agua", pasos:"pasos", ses:"ses", tel:"tel" };
+  for(var k in mapa){ if(p.has(k)){ var v = p.get(k);
+    cfg[mapa[k]] = (["nombre","inicio","tel"].indexOf(mapa[k])>=0) ? v : parseFloat(v); tocado = true; } }
+  if(tocado) guardar("eira_cfg", cfg);
+})();
+
+var log = leer("eira_log", {});
+function guardarLog(){ guardar("eira_log", log); }
+
+/* ─────────── utilidades de fecha ─────────── */
+var DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+var MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+function iso(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function deIso(s){ var p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function bonita(d){ return DIAS[d.getDay()]+" "+d.getDate()+" "+MESES[d.getMonth()]; }
+function lunesDe(d){ var x = new Date(d); var n = (x.getDay()+6)%7; x.setDate(x.getDate()-n); x.setHours(0,0,0,0); return x; }
+function semanaPrograma(d){
+  if(!cfg.inicio) return null;
+  var dif = Math.floor((lunesDe(d) - lunesDe(deIso(cfg.inicio)))/86400000);
+  return Math.floor(dif/7)+1;
+}
+
+/* ─────────── estado ─────────── */
+var hoy = new Date(); hoy.setHours(0,0,0,0);
+var fecha = new Date(hoy);
+var semAncla = lunesDe(hoy);
+
+var CAMPOS = ["peso","kcal","prot","carb","gras","agua","pasos","ejer","min","rpe","sueno","notas"];
+var ESCALAS = ["calidad","energia","digestion","protocolo"];
+
+function dia(k){ return log[k] || {}; }
+
+/* ─────────── anillos ─────────── */
+function anillo(valor, meta, etiqueta, decimales){
+  var pct = meta>0 ? Math.min(valor/meta, 1.35) : 0;
+  var R = 26, C = 2*Math.PI*R;
+  var off = C * (1 - Math.min(pct,1));
+  var col = (pct>=0.9 && pct<=1.15) ? "var(--verde)" : (pct>0 ? "var(--cobre)" : "var(--linea)");
+  var txt = valor ? (decimales ? valor.toFixed(1) : Math.round(valor)) : "—";
+  return '<div class="anillo"><svg viewBox="0 0 64 64">'+
+    '<circle cx="32" cy="32" r="'+R+'" fill="none" stroke="#E9E2D4" stroke-width="5"/>'+
+    '<circle cx="32" cy="32" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="5" stroke-linecap="round"'+
+    ' stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 32 32)"/>'+
+    '<text class="v" x="32" y="37" text-anchor="middle">'+txt+'</text></svg>'+
+    '<div class="n">'+etiqueta+'</div></div>';
+}
+function pintarAnillos(){
+  var d = dia(iso(fecha));
+  document.getElementById("anillos").innerHTML =
+    anillo(+d.kcal||0, cfg.kcal, "KCAL") +
+    anillo(+d.prot||0, cfg.prot, "PROTEÍNA") +
+    anillo(+d.agua||0, cfg.agua, "AGUA", true) +
+    anillo(+d.pasos||0, cfg.pasos, "PASOS");
+}
+
+/* ─────────── escalas ─────────── */
+function pintarEscalas(){
+  var d = dia(iso(fecha));
+  document.querySelectorAll(".escala").forEach(function(cont){
+    var k = cont.dataset.k;
+    var opts = cont.dataset.opts ? cont.dataset.opts.split("|") : ["1","2","3","4","5"];
+    cont.innerHTML = opts.map(function(o){
+      return '<button data-v="'+o+'"'+(String(d[k])===o?' class="on"':'')+'>'+o+'</button>';
+    }).join("");
+  });
+}
+document.addEventListener("click", function(e){
+  var b = e.target.closest(".escala button"); if(!b) return;
+  var k = b.parentNode.dataset.k, key = iso(fecha);
+  log[key] = log[key] || {};
+  log[key][k] = (String(log[key][k]) === b.dataset.v) ? "" : b.dataset.v;
+  guardarLog(); pintarEscalas(); avisar("okHoy","Guardado");
+});
+
+/* ─────────── formulario del día ─────────── */
+function cargarDia(){
+  var key = iso(fecha), d = dia(key);
+  CAMPOS.forEach(function(c){ var el = document.getElementById(c); if(el) el.value = (d[c]!==undefined? d[c] : ""); });
+  document.getElementById("fTxt").textContent = (iso(fecha)===iso(hoy) ? "hoy · " : "") + bonita(fecha);
+  var s = semanaPrograma(fecha);
+  document.getElementById("fSem").textContent = s ? ("SEMANA "+s+" DEL PROGRAMA") : fecha.getFullYear();
+  document.getElementById("bNext").style.visibility = (iso(fecha)===iso(hoy)) ? "hidden" : "visible";
+  pintarAnillos(); pintarEscalas();
+}
+CAMPOS.forEach(function(c){
+  var el = document.getElementById(c); if(!el) return;
+  el.addEventListener("input", function(){
+    var key = iso(fecha); log[key] = log[key] || {};
+    log[key][c] = el.value; guardarLog(); pintarAnillos(); avisar("okHoy","Guardado");
+  });
+});
+document.getElementById("bPrev").onclick = function(){ fecha.setDate(fecha.getDate()-1); cargarDia(); };
+document.getElementById("bNext").onclick = function(){
+  if(iso(fecha)===iso(hoy)) return; fecha.setDate(fecha.getDate()+1); cargarDia(); };
+
+var tOk;
+function avisar(id, txt){ var el = document.getElementById(id); el.textContent = txt;
+  clearTimeout(tOk); tOk = setTimeout(function(){ el.textContent=""; }, 1800); }
+
+/* ─────────── semana ─────────── */
+function diasDe(ancla){ var a = []; for(var i=0;i<7;i++){ var d = new Date(ancla); d.setDate(d.getDate()+i); a.push(d); } return a; }
+function prom(arr){ var v = arr.filter(function(x){ return x!==null && !isNaN(x); });
+  return v.length ? v.reduce(function(a,b){return a+b;},0)/v.length : null; }
+function num(x){ return (x===""||x===undefined||x===null) ? null : parseFloat(x); }
+
+function resumenSemana(){
+  var ds = diasDe(semAncla), r = { dias:0, peso:[], kcal:[], prot:[], pasos:[], sueno:[], energia:[],
+    minTot:0, ses:0, prot_ok:0, filas:[] };
+  ds.forEach(function(d){
+    var k = iso(d), e = log[k], tiene = false;
+    if(e){ for(var p in e){ if(e[p]!=="" && e[p]!==undefined){ tiene = true; break; } } }
+    if(tiene) r.dias++;
+    if(e){
+      if(num(e.peso)!==null) r.peso.push(num(e.peso));
+      if(num(e.kcal)!==null) r.kcal.push(num(e.kcal));
+      if(num(e.prot)!==null) r.prot.push(num(e.prot));
+      if(num(e.pasos)!==null) r.pasos.push(num(e.pasos));
+      if(num(e.sueno)!==null) r.sueno.push(num(e.sueno));
+      if(num(e.energia)!==null) r.energia.push(num(e.energia));
+      if(num(e.min)!==null) r.minTot += num(e.min);
+      if(num(e.min) > 0) r.ses++;
+      if(e.protocolo==="Sí") r.prot_ok += 1; else if(e.protocolo==="Parcial") r.prot_ok += 0.5;
+    }
+    r.filas.push({ d:d, e:e||{}, tiene:tiene });
+  });
+  r.pesoP = prom(r.peso); r.kcalP = prom(r.kcal); r.protP = prom(r.prot);
+  r.pasosP = prom(r.pasos); r.suenoP = prom(r.sueno); r.energiaP = prom(r.energia);
+  r.adhKcal = (r.kcalP && cfg.kcal) ? r.kcalP/cfg.kcal : null;
+  r.adhProt = (r.protP && cfg.prot) ? r.protP/cfg.prot : null;
+  r.adhProto = r.dias ? r.prot_ok/r.dias : null;
+  return r;
+}
+function pintarSemana(){
+  var fin = new Date(semAncla); fin.setDate(fin.getDate()+6);
+  var s = semanaPrograma(semAncla);
+  document.getElementById("wTxt").textContent = s ? ("Semana "+s) : "Semana";
+  document.getElementById("wRango").textContent =
+    semAncla.getDate()+" "+MESES[semAncla.getMonth()]+" — "+fin.getDate()+" "+MESES[fin.getMonth()];
+  document.getElementById("wNext").style.visibility =
+    (lunesDe(hoy).getTime()===semAncla.getTime()) ? "hidden" : "visible";
+
+  var r = resumenSemana();
+  function kpi(n,v,u){ return '<div class="kpi"><div class="n">'+n+'</div><div class="v">'+v+
+    (u?' <small>'+u+'</small>':'')+'</div></div>'; }
+  document.getElementById("kpis").innerHTML =
+    kpi("DÍAS REGISTRADOS", r.dias, "de 7") +
+    kpi("PESO PROMEDIO", r.pesoP!==null ? r.pesoP.toFixed(1) : "—", "kg") +
+    kpi("ADHERENCIA KCAL", r.adhKcal!==null ? Math.round(r.adhKcal*100)+"%" : "—") +
+    kpi("SESIONES", r.ses, "de "+cfg.ses);
+
+  var h = "<tr><th>DÍA</th><th>KCAL</th><th>PROT</th><th>EJERCICIO</th><th>SUEÑO</th></tr>";
+  r.filas.forEach(function(f){
+    h += '<tr'+(f.tiene?'':' class="vacio"')+'><td>'+DIAS[f.d.getDay()].slice(0,3)+" "+f.d.getDate()+"</td>"+
+      "<td>"+(f.e.kcal||"—")+"</td><td>"+(f.e.prot||"—")+"</td>"+
+      "<td>"+(f.e.min? f.e.min+"′" : "—")+"</td><td>"+(f.e.sueno? f.e.sueno+"h" : "—")+"</td></tr>";
+  });
+  document.getElementById("tSemana").innerHTML = h;
+}
+document.getElementById("wPrev").onclick = function(){ semAncla.setDate(semAncla.getDate()-7); pintarSemana(); };
+document.getElementById("wNext").onclick = function(){
+  if(lunesDe(hoy).getTime()===semAncla.getTime()) return;
+  semAncla.setDate(semAncla.getDate()+7); pintarSemana(); };
+
+/* ─────────── reporte semanal ─────────── */
+function textoReporte(){
+  var r = resumenSemana(), s = semanaPrograma(semAncla);
+  var fin = new Date(semAncla); fin.setDate(fin.getDate()+6);
+  function v(x, u, dec){ return (x===null||x===undefined) ? "sin dato" : (dec? x.toFixed(1):Math.round(x))+(u||""); }
+  var diasOk = r.filas.filter(function(f){
+    var e = f.e; var k = num(e.kcal), p = num(e.prot);
+    return k!==null && p!==null && cfg.kcal && cfg.prot &&
+           k <= cfg.kcal*1.1 && p >= cfg.prot*0.9; }).length;
+  var t = "*Reporte EIRA · " + (cfg.nombre || "") + "*\n" +
+    (s ? "Semana " + s : "Semana") + " · " + semAncla.getDate()+" "+MESES[semAncla.getMonth()] +
+    " al " + fin.getDate()+" "+MESES[fin.getMonth()] + "\n\n" +
+    "1. Peso promedio: " + v(r.pesoP,"" ,true) + " kg\n" +
+    "2. Días que cumplí calorías y proteína: " + diasOk + " de 7\n" +
+    "3. Promedios: " + v(r.kcalP," kcal") + " · " + v(r.protP," g de proteína") + "\n" +
+    "4. Entrenamientos: " + r.ses + " sesiones · " + Math.round(r.minTot) + " min en total\n" +
+    "5. Sueño promedio: " + v(r.suenoP,"" ,true) + " h · Energía: " + v(r.energiaP,"/5",true) + "\n" +
+    "6. Protocolo: cumplí " + (r.adhProto!==null ? Math.round(r.adhProto*100)+"%" : "sin dato") +
+      " de los días registrados (" + r.dias + " de 7)\n" +
+    "7. Lo más difícil de esta semana: ";
+  var notas = r.filas.filter(function(f){ return f.e.notas; })
+                     .map(function(f){ return f.e.notas.trim(); });
+  t += notas.length ? "\n   • " + notas.join("\n   • ") : "_(escríbelo aquí antes de enviar)_";
+  return t;
+}
+document.getElementById("bWhats").onclick = function(){
+  var tel = (cfg.tel||"").replace(/\D/g,"");
+  var url = (tel ? "https://wa.me/"+tel+"?text=" : "https://wa.me/?text=") +
+            encodeURIComponent(textoReporte());
+  window.open(url, "_blank");
+};
+document.getElementById("bCopiar").onclick = function(){
+  var t = textoReporte();
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){ avisar("okSem","Reporte copiado"); },
+      function(){ fallback(t); });
+  } else fallback(t);
+  function fallback(x){
+    var ta = document.createElement("textarea"); ta.value = x; ta.style.position="fixed";
+    ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); avisar("okSem","Reporte copiado"); }
+    catch(e){ avisar("okSem","No se pudo copiar"); }
+    document.body.removeChild(ta);
+  }
+};
+
+/* ─────────── ajustes ─────────── */
+var CFGMAP = { cfgNombre:"nombre", cfgInicio:"inicio", cfgKcal:"kcal", cfgProt:"prot",
+               cfgAgua:"agua", cfgPasos:"pasos", cfgSes:"ses", cfgTel:"tel" };
+function cargarCfg(){
+  for(var id in CFGMAP){ var el = document.getElementById(id); if(el) el.value = cfg[CFGMAP[id]] || ""; }
+  document.getElementById("hNombre").textContent = cfg.nombre || "Seguimiento";
+  document.getElementById("hPrograma").textContent = cfg.inicio ? "PROGRAMA EIRA" : "REGISTRO DIARIO";
+}
+for(var id in CFGMAP){ (function(idd){
+  var el = document.getElementById(idd); if(!el) return;
+  el.addEventListener("input", function(){
+    var campo = CFGMAP[idd], val = el.value;
+    cfg[campo] = (["nombre","inicio","tel"].indexOf(campo)>=0) ? val : parseFloat(val)||0;
+    guardar("eira_cfg", cfg); cargarCfg(); pintarAnillos(); avisar("okCfg","Guardado");
+  });
+})(id); }
+
+document.getElementById("bExport").onclick = function(){
+  var datos = JSON.stringify({ cfg:cfg, log:log, exportado:new Date().toISOString() }, null, 2);
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([datos], {type:"application/json"}));
+  a.download = "respaldo-eira-" + iso(new Date()) + ".json";
+  a.click(); URL.revokeObjectURL(a.href); avisar("okCfg","Respaldo descargado");
+};
+document.getElementById("bImport").onclick = function(){ document.getElementById("fileImport").click(); };
+document.getElementById("fileImport").onchange = function(ev){
+  var f = ev.target.files[0]; if(!f) return;
+  var fr = new FileReader();
+  fr.onload = function(){
+    try{
+      var d = JSON.parse(fr.result);
+      if(d.log) { log = d.log; guardarLog(); }
+      if(d.cfg) { cfg = Object.assign({}, CFG_DEF, d.cfg); guardar("eira_cfg", cfg); }
+      cargarCfg(); cargarDia(); pintarSemana(); avisar("okCfg","Respaldo restaurado");
+    }catch(e){ avisar("okCfg","Archivo no válido"); }
+  };
+  fr.readAsText(f); ev.target.value = "";
+};
+
+/* ─────────── navegación ─────────── */
+document.querySelectorAll("nav button").forEach(function(b){
+  b.onclick = function(){
+    document.querySelectorAll("nav button").forEach(function(x){ x.classList.remove("on"); });
+    document.querySelectorAll("section").forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    document.getElementById("s-"+b.dataset.s).classList.add("on");
+    if(b.dataset.s==="semana") pintarSemana();
+    window.scrollTo(0,0);
+  };
+});
+
+/* ─────────── arranque ─────────── */
+cargarCfg(); cargarDia(); pintarSemana();
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+}
+</script>
+</body>
+</html>
