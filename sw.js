@@ -1,5 +1,5 @@
 /* EIRA Seguimiento · service worker */
-var CACHE = "eira-seguimiento-v4";
+var CACHE = "eira-seguimiento-v5";
 var ARCHIVOS = ["./", "./index.html", "./manifest.webmanifest", "./logo_eira.png",
                 "./icon-192.png", "./icon-512.png"];
 
