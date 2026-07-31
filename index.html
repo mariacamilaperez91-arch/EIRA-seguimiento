@@ -33,6 +33,13 @@ header{padding:18px 0 12px;display:flex;align-items:center;justify-content:space
 header img{height:30px}
 header .quien{text-align:right;font-size:10px;letter-spacing:.1em;color:var(--piedra);line-height:1.5}
 header .quien b{display:block;font-size:12px;color:var(--grafito);letter-spacing:.02em;font-weight:600}
+.metasBar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.metasBar .m{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:5px 10px;
+  font-size:11px;color:var(--piedra);white-space:nowrap}
+.metasBar .m b{color:var(--grafito);font-weight:700;font-size:11.5px}
+.metasBar .t{width:100%;font-size:9px;letter-spacing:.22em;color:var(--cobre);font-weight:700;margin-bottom:1px}
+.anillo .n small{display:block;font-size:8.5px;letter-spacing:.04em;color:var(--piedra);
+  font-weight:500;margin-top:1px}
 
 /* ── avisos ── */
 .aviso{background:#FBF0E9;border-left:3px solid var(--cobre);padding:10px 13px;border-radius:0 6px 6px 0;
@@ -161,6 +168,8 @@ pre{background:var(--suave);border:1px solid var(--linea);border-radius:10px;pad
       <div class="txt"><div class="d" id="fTxt">—</div><div class="s" id="fSem">—</div></div>
       <button id="bNext" aria-label="Día siguiente">›</button>
     </div>
+
+    <div class="metasBar" id="metasBar"></div>
 
     <div class="anillos" id="anillos"></div>
 
@@ -314,10 +323,42 @@ function leer(k,def){ var s = null;
   if(s===undefined||s===null) return def;
   try{ return JSON.parse(s); }catch(e){ return def; } }
 
+/* ─────────── identidad de la paciente ───────────
+   Cada paciente guarda bajo su propia llave. Así dos enlaces distintos
+   abiertos en el mismo navegador no se pisan entre sí. */
+function slug(x){
+  return String(x || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 28);
+}
+var PID = (function(){
+  var p = new URLSearchParams(location.search);
+  var id = p.get("pid") || slug(p.get("n") || p.get("nombre") || "");
+  if(!id){ try { id = localStorage.getItem("eira_pid") || ""; } catch(e){} }
+  if(!id) id = "principal";
+  try { localStorage.setItem("eira_pid", id); } catch(e){}
+  return id;
+})();
+var K_CFG = "eira_cfg:" + PID, K_LOG = "eira_log:" + PID;
+
+/* migración desde la versión anterior, que usaba una sola llave */
+(function(){
+  try {
+    var viejoCfg = localStorage.getItem("eira_cfg");
+    var viejoLog = localStorage.getItem("eira_log");
+    if((viejoCfg || viejoLog) && !localStorage.getItem(K_CFG) && !localStorage.getItem(K_LOG)){
+      if(viejoCfg) localStorage.setItem(K_CFG, viejoCfg);
+      if(viejoLog) localStorage.setItem(K_LOG, viejoLog);
+    }
+    localStorage.removeItem("eira_cfg");
+    localStorage.removeItem("eira_log");
+  } catch(e){}
+})();
+
 /* ─────────── configuración ─────────── */
 var CFG_DEF = { nombre:"", inicio:"", kcal:1600, prot:125, carb:150, gras:55, agua:2.2,
                 pasos:8000, ses:3, tel:"573504628131", ciclo:"si", molecula:"" };
-var cfg = Object.assign({}, CFG_DEF, leer("eira_cfg", {}));
+var cfg = Object.assign({}, CFG_DEF, leer(K_CFG, {}));
 
 /* personalización por enlace: ?n=Nombre&kcal=1600&prot=125&agua=2.2&pasos=8000&ses=3&inicio=2026-08-03&tel=57... */
 (function(){
@@ -328,11 +369,11 @@ var cfg = Object.assign({}, CFG_DEF, leer("eira_cfg", {}));
   for(var k in mapa){ if(p.has(k)){ var v = p.get(k);
     cfg[mapa[k]] = (["nombre","inicio","tel","ciclo","molecula"].indexOf(mapa[k])>=0) ? v : parseFloat(v);
     tocado = true; } }
-  if(tocado) guardar("eira_cfg", cfg);
+  if(tocado) guardar(K_CFG, cfg);
 })();
 
-var log = leer("eira_log", {});
-function guardarLog(){ guardar("eira_log", log); }
+var log = leer(K_LOG, {});
+function guardarLog(){ guardar(K_LOG, log); }
 
 /* ─────────── utilidades de fecha ─────────── */
 var DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
@@ -363,7 +404,7 @@ function num(x){ if(x===""||x===undefined||x===null) return null;
   var n = parseFloat(String(x).replace(",", ".")); return isNaN(n) ? null : n; }
 
 /* ─────────── anillos ─────────── */
-function anillo(valor, meta, etiqueta, decimales){
+function anillo(valor, meta, etiqueta, decimales, unidad){
   var pct = meta>0 ? Math.min(valor/meta, 1.35) : 0;
   var R = 26, C = 2*Math.PI*R;
   var off = C * (1 - Math.min(pct,1));
@@ -374,16 +415,28 @@ function anillo(valor, meta, etiqueta, decimales){
     '<circle cx="32" cy="32" r="'+R+'" fill="none" stroke="'+col+'" stroke-width="5" stroke-linecap="round"'+
     ' stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+off.toFixed(1)+'" transform="rotate(-90 32 32)"/>'+
     '<text class="v" x="32" y="37" text-anchor="middle">'+txt+'</text></svg>'+
-    '<div class="n">'+etiqueta+'</div></div>';
+    '<div class="n">'+etiqueta+
+      (meta ? '<small>de '+(decimales ? meta : Math.round(meta))+(unidad||'')+'</small>' : '')+
+      '</div></div>';
 }
+function pintarMetas(){
+  var b = document.getElementById("metasBar"); if(!b) return;
+  function m(v, u, etq){ return v ? '<span class="m"><b>'+v+'</b>'+(u||'')+' '+etq+'</span>' : ''; }
+  b.innerHTML = '<span class="t">TUS METAS DIARIAS</span>' +
+    m(cfg.kcal, "", "kcal") + m(cfg.prot, " g", "proteína") +
+    m(cfg.carb, " g", "carbos") + m(cfg.gras, " g", "grasa") +
+    m(cfg.agua, " L", "agua") + m(cfg.pasos, "", "pasos") +
+    (cfg.ses ? '<span class="m"><b>'+cfg.ses+'</b> sesiones de fuerza / semana</span>' : '');
+}
+
 function pintarAnillos(){
   var d = dia(iso(fecha));
   document.getElementById("anillos").innerHTML =
     anillo(num(d.kcal)||0, cfg.kcal, "KCAL") +
-    anillo(num(d.prot)||0, cfg.prot, "PROTEÍNA") +
-    anillo(num(d.carb)||0, cfg.carb, "CARBOS") +
-    anillo(num(d.gras)||0, cfg.gras, "GRASA") +
-    anillo(num(d.agua)||0, cfg.agua, "AGUA", true) +
+    anillo(num(d.prot)||0, cfg.prot, "PROTEÍNA", false, " g") +
+    anillo(num(d.carb)||0, cfg.carb, "CARBOS", false, " g") +
+    anillo(num(d.gras)||0, cfg.gras, "GRASA", false, " g") +
+    anillo(num(d.agua)||0, cfg.agua, "AGUA", true, " L") +
     anillo(num(d.pasos)||0, cfg.pasos, "PASOS");
 }
 
@@ -497,7 +550,7 @@ function cargarDia(){
   document.getElementById("grpCiclo").style.display = verCiclo ? "" : "none";
   var tA = document.getElementById("ttlAplic");
   tA.textContent = cfg.molecula ? ("APLICACIÓN · " + String(cfg.molecula).toUpperCase()) : "APLICACIÓN";
-  pintarAnillos(); pintarEscalas();
+  pintarMetas(); pintarAnillos(); pintarEscalas();
 }
 CAMPOS.forEach(function(c){
   var el = document.getElementById(c); if(!el) return;
@@ -733,6 +786,7 @@ function cargarCfg(){
   var sc = document.getElementById("cfgCiclo"); if(sc) sc.value = (cfg.ciclo === "no") ? "no" : "si";
   document.getElementById("hNombre").textContent = cfg.nombre || "Seguimiento";
   document.getElementById("hPrograma").textContent = cfg.inicio ? "PROGRAMA EIRA" : "REGISTRO DIARIO";
+  pintarMetas();
 }
 for(var id in CFGMAP){ (function(idd){
   var el = document.getElementById(idd); if(!el) return;
@@ -740,15 +794,15 @@ for(var id in CFGMAP){ (function(idd){
     var campo = CFGMAP[idd], val = el.value;
     cfg[campo] = (["nombre","inicio","tel","ciclo","molecula"].indexOf(campo)>=0) ? val
                  : (parseFloat(String(val).replace(",", ".")) || 0);
-    guardar("eira_cfg", cfg); cargarCfg(); cargarDia(); avisar("okCfg","Guardado");
+    guardar(K_CFG, cfg); cargarCfg(); cargarDia(); avisar("okCfg","Guardado");
   });
 })(id); }
 
 document.getElementById("bExport").onclick = function(){
-  var datos = JSON.stringify({ cfg:cfg, log:log, exportado:new Date().toISOString() }, null, 2);
+  var datos = JSON.stringify({ pid:PID, cfg:cfg, log:log, exportado:new Date().toISOString() }, null, 2);
   var a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([datos], {type:"application/json"}));
-  a.download = "respaldo-eira-" + iso(new Date()) + ".json";
+  a.download = "respaldo-eira-" + (PID || "paciente") + "-" + iso(new Date()) + ".json";
   a.click(); URL.revokeObjectURL(a.href); avisar("okCfg","Respaldo descargado");
 };
 document.getElementById("bImport").onclick = function(){ document.getElementById("fileImport").click(); };
@@ -759,7 +813,7 @@ document.getElementById("fileImport").onchange = function(ev){
     try{
       var d = JSON.parse(fr.result);
       if(d.log) { log = d.log; guardarLog(); }
-      if(d.cfg) { cfg = Object.assign({}, CFG_DEF, d.cfg); guardar("eira_cfg", cfg); }
+      if(d.cfg) { cfg = Object.assign({}, CFG_DEF, d.cfg); guardar(K_CFG, cfg); }
       cargarCfg(); cargarDia(); pintarSemana(); avisar("okCfg","Respaldo restaurado");
     }catch(e){ avisar("okCfg","Archivo no válido"); }
   };
